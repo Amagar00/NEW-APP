@@ -1,0 +1,43 @@
+# .github/workflows/build.yml
+name: Build Electron App
+
+on:
+  # This makes the workflow run whenever you commit a change
+  push:
+    branches:
+      - main
+  # Allows you to manually trigger the workflow from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    # Use a clean, stable Windows virtual machine on the cloud
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      # Install Node.js, which is required for Electron
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20 
+
+    - name: Install Dependencies
+      # This downloads electron-packager and the Electron binary 
+      # on the stable cloud server. This step will succeed here.
+      run: npm install
+
+    - name: Run Electron Packager to Build EXE
+      # This runs the 'package' script defined in your package.json 
+      # to create the executable.
+      run: npm run package
+
+    - name: Upload Windows Artifact
+      # This saves the final packaged folder so you can download it.
+      uses: actions/upload-artifact@v4
+      with:
+        name: AMAGAR-DS-Results-Windows
+        # Path where electron-packager saves the final files
+        path: dist/AMAGAR_DS_Results-win32-x64/
